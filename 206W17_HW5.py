@@ -48,17 +48,17 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser()) # Set up library to g
 
 #### Recommended order of tasks: ####
 ## 1. Set up the caching pattern start -- the dictionary and the try/except statement shown in class.
+## 2. Write a function to get twitter data that works with the caching pattern, so it either gets new data or caches data, depending upon what the input to search for is. You can model this off the class exercise from Tuesday.
 
 def getSearchQuery():
   search_query = input("Please enter your search query: ")
   return search_query
 
-def getTwitterCache(consumerKey, consumerSecret, accessToken, accessSecret):
+def getWithCaching(consumerKey, consumerSecret, accessToken, accessSecret):
   """grab live Twitter data from your user timeline and cache it"""
   if not consumer_secret or not consumer_key:
     print ("You need to fill in client_key and client_secret.")
     exit()
-
 
   try:
     twitterFile = open("twitterData.txt", 'r') # Try to read the data from the file
@@ -81,12 +81,19 @@ def getTwitterCache(consumerKey, consumerSecret, accessToken, accessSecret):
 
 
 
-
-
-## 2. Write a function to get twitter data that works with the caching pattern, so it either gets new data or caches data, depending upon what the input to search for is. You can model this off the class exercise from Tuesday.
-
-
 ## 3. Invoke your function, save the return value in a variable, and explore the data you got back!
+
+def getTwitterData():
+  getWithCaching(consumer_key, consumer_secret, access_token, access_token_secret)
+  tweetData = open('twitterData.txt').read() #open Twitter data
+  
+  tweetDict = json.loads(tweetData)
+  list_of_tweets = tweetDict["statuses"]
+  print( list_of_tweets)
+
+getTwitterData()
+
+
 
 
 ## 4. With what you learn from the data -- e.g. how exactly to find the text of each tweet in the big nested structure -- write code to print out content from 3 tweets, as shown above.
