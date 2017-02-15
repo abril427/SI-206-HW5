@@ -48,23 +48,47 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser()) # Set up library to g
 
 #### Recommended order of tasks: ####
 ## 1. Set up the caching pattern start -- the dictionary and the try/except statement shown in class.
-def getTwitterCache(consumerkey, consumersecret, accesstoken, accesssecret):
+
+def getSearchQuery():
+  search_query = input("Please enter your search query: ")
+  return search_query
+
+def getTwitterCache(consumerKey, consumerSecret, accessToken, accessSecret):
   """grab live Twitter data from your user timeline and cache it"""
   if not consumer_secret or not consumer_key:
     print ("You need to fill in client_key and client_secret.")
     exit()
 
-  search_query = input("Please enter your search query: ")
-  results = api.search(q=search_query) 
 
-  #cache data
-  twitterFile = open('twitterData.txt', 'w')
-  twitterFile.write(json.dumps(results))
-  twitterFile.close()
+  try:
+    twitterFile = open("twitterData.txt", 'r') # Try to read the data from the file
+    cache_contents = twitterFile.read() # If it's there, get it into a string
+    CACHE_DICTION = json.loads(cache_contents) # And then load it into a dictionary
+    twitterFile.close() # Close the file, we're good, we got the data in a dictionary.
+  except:
+    CACHE_DICTION = {} # If there wasn't any data, then the dictionary should be empty. We're gonna rely on this dictionary existing to check if we have any data saved yet. 
 
-getTwitterCache(consumer_key, consumer_secret, access_token, access_token_secret)
+  search_query = getSearchQuery()
+  parameters = {'q': search_query}
+  if search_query not in parameters:
+    results = api.search(q=search_query)
+    parameters['q'] = search_query 
+    #cache data
+    twitterFile = open('twitterData.txt', 'w')
+    twitterFile.write(json.dumps(results))
+    twitterFile.close()
+  #else work with data already cached
+
+
+
+
+
 ## 2. Write a function to get twitter data that works with the caching pattern, so it either gets new data or caches data, depending upon what the input to search for is. You can model this off the class exercise from Tuesday.
+
+
 ## 3. Invoke your function, save the return value in a variable, and explore the data you got back!
+
+
 ## 4. With what you learn from the data -- e.g. how exactly to find the text of each tweet in the big nested structure -- write code to print out content from 3 tweets, as shown above.
 
 
