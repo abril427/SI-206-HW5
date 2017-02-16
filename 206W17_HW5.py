@@ -69,16 +69,13 @@ def getWithCaching(consumerKey, consumerSecret, accessToken, accessSecret, searc
   results_url = api.search(q=searchQuery)
 
   if searchQuery in CACHE_DICTION: # if we've already made this request
-    print('using cache')
+    # print('using cache')
       # use stored response
     response_text = CACHE_DICTION[searchQuery] # grab the data from the cache
   else: # otherwise
-    print('fetching')
+    # print('fetching')
     results = results_url
     CACHE_DICTION[searchQuery] = results   
-    # responses = json.dumps(CACHE_DICTION[searchQuery])
-    # response_text = responses.text
-    # print(response_text)
 
     #cache data
     twitterFile = open('twitterData.txt', 'w')
