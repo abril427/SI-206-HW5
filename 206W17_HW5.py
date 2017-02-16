@@ -60,45 +60,33 @@ except:
 
 ## 2. Write a function to get twitter data that works with the caching pattern, so it either gets new data or caches data, depending upon what the input to search for is. You can model this off the class exercise from Tuesday.
 
-# def requestURL(search):
-#   req = api.search(q=search)
-#   return req
-
-
 def getWithCaching(consumerKey, consumerSecret, accessToken, accessSecret, searchQuery):
   """grab live Twitter data from your user timeline and cache it"""
   if not consumer_secret or not consumer_key:
     print ("You need to fill in client_key and client_secret.")
     exit()
 
-  # search_query = getSearchQuery()
-  ## parameters = {'q': searchQuery}
-  ## if searchQuery not in parameters:
   results_url = api.search(q=searchQuery)
-    # parameters['q'] = searchQuery 
-    
-  #else work with data already cached
+
   if searchQuery in CACHE_DICTION: # if we've already made this request
     print('using cache')
       # use stored response
     response_text = CACHE_DICTION[searchQuery] # grab the data from the cache
   else: # otherwise
     print('fetching')
-        # do the work of calling the API
     results = results_url
     CACHE_DICTION[searchQuery] = results   
-    
+    # responses = json.dumps(CACHE_DICTION[searchQuery])
+    # response_text = responses.text
+    # print(response_text)
+
     #cache data
     twitterFile = open('twitterData.txt', 'w')
     twitterFile.write(json.dumps(CACHE_DICTION))
     twitterFile.close()
 
-  response_text = open('twitterData.txt').read() #open Twitter data
-  response_dictionary = json.loads(response_text) # whichver way we got the data, load it into a python object
-  return response_dictionary # and return it from the function!
-
-
-
+    response_text = CACHE_DICTION[searchQuery] # whichver way we got the data, load it into a python object
+  return response_text # and return it from the function!
 
 
 ## 3. Invoke your function, save the return value in a variable, and explore the data you got back!
@@ -108,8 +96,6 @@ def getTwitterData():
   tweets = getWithCaching(consumer_key, consumer_secret, access_token, access_token_secret, search_query)
   list_of_tweets = tweets["statuses"]
   return list_of_tweets
-
-
 
 
 ## 4. With what you learn from the data -- e.g. how exactly to find the text of each tweet in the big nested structure -- write code to print out content from 3 tweets, as shown above.
