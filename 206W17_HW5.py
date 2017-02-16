@@ -48,11 +48,22 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser()) # Set up library to g
 
 #### Recommended order of tasks: ####
 ## 1. Set up the caching pattern start -- the dictionary and the try/except statement shown in class.
+
+try:
+  twitterFile = open("twitterData.txt", 'r') # Try to read the data from the file
+  cache_contents = twitterFile.read() # If it's there, get it into a string
+  CACHE_DICTION = json.loads(cache_contents) # And then load it into a dictionary
+  twitterFile.close() # Close the file, we're good, we got the data in a dictionary.
+except:
+  CACHE_DICTION = {} # If there wasn't any data, then the dictionary should be empty. We're gonna rely on this dictionary existing to check if we have any data saved yet. 
+
+
 ## 2. Write a function to get twitter data that works with the caching pattern, so it either gets new data or caches data, depending upon what the input to search for is. You can model this off the class exercise from Tuesday.
 
-# def getSearchQuery():
-#   search_query = input("Please enter your search query: ")
-#   return search_query
+# def requestURL(search):
+#   req = api.search(q=search)
+#   return req
+
 
 def getWithCaching(consumerKey, consumerSecret, accessToken, accessSecret, searchQuery):
   """grab live Twitter data from your user timeline and cache it"""
@@ -60,24 +71,33 @@ def getWithCaching(consumerKey, consumerSecret, accessToken, accessSecret, searc
     print ("You need to fill in client_key and client_secret.")
     exit()
 
-  try:
-    twitterFile = open("twitterData.txt", 'r') # Try to read the data from the file
-    cache_contents = twitterFile.read() # If it's there, get it into a string
-    CACHE_DICTION = json.loads(cache_contents) # And then load it into a dictionary
-    twitterFile.close() # Close the file, we're good, we got the data in a dictionary.
-  except:
-    CACHE_DICTION = {} # If there wasn't any data, then the dictionary should be empty. We're gonna rely on this dictionary existing to check if we have any data saved yet. 
-
   # search_query = getSearchQuery()
-  parameters = {'q': searchQuery}
-  if searchQuery not in parameters:
-    results = api.search(q=searchQuery)
-    parameters['q'] = searchQuery 
+  ## parameters = {'q': searchQuery}
+  ## if searchQuery not in parameters:
+  results_url = api.search(q=searchQuery)
+    # parameters['q'] = searchQuery 
+    
+  #else work with data already cached
+  if searchQuery in CACHE_DICTION: # if we've already made this request
+    print('using cache')
+      # use stored response
+    response_text = CACHE_DICTION[searchQuery] # grab the data from the cache
+  else: # otherwise
+    print('fetching')
+        # do the work of calling the API
+    results = results_url
+    CACHE_DICTION[searchQuery] = results   
+    
     #cache data
     twitterFile = open('twitterData.txt', 'w')
-    twitterFile.write(json.dumps(results))
+    twitterFile.write(json.dumps(CACHE_DICTION))
     twitterFile.close()
-  #else work with data already cached
+
+  response_text = open('twitterData.txt').read() #open Twitter data
+  response_dictionary = json.loads(response_text) # whichver way we got the data, load it into a python object
+  return response_dictionary # and return it from the function!
+
+
 
 
 
@@ -85,10 +105,8 @@ def getWithCaching(consumerKey, consumerSecret, accessToken, accessSecret, searc
 
 def getTwitterData():
   search_query = input("Please enter your search query: ")
-  getWithCaching(consumer_key, consumer_secret, access_token, access_token_secret, search_query)
-  tweetData = open('twitterData.txt').read() #open Twitter data
-  tweetDict = json.loads(tweetData) #load Twitter data
-  list_of_tweets = tweetDict["statuses"]
+  tweets = getWithCaching(consumer_key, consumer_secret, access_token, access_token_secret, search_query)
+  list_of_tweets = tweets["statuses"]
   return list_of_tweets
 
 
