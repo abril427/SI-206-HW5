@@ -86,20 +86,20 @@ def getWithCaching(consumerKey, consumerSecret, accessToken, accessSecret):
 def getTwitterData():
   getWithCaching(consumer_key, consumer_secret, access_token, access_token_secret)
   tweetData = open('twitterData.txt').read() #open Twitter data
-  
-  tweetDict = json.loads(tweetData)
+  tweetDict = json.loads(tweetData) #load Twitter data
   list_of_tweets = tweetDict["statuses"]
-  print( list_of_tweets)
-
-getTwitterData()
+  return list_of_tweets
 
 
 
 
 ## 4. With what you learn from the data -- e.g. how exactly to find the text of each tweet in the big nested structure -- write code to print out content from 3 tweets, as shown above.
-
-
-
+ 
+tweets = getTwitterData()
+for tweet in tweets:
+  print(tweet["text"])
+  print(tweet["created_at"])
+  print("\n")
 
 
 
